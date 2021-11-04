@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+
+import argparse
+import requests
+import sys
+
+def upload_file(url: str, files: list[str]):
+    s = requests.session()
+    endpoint = url + '/upload'
+    for file in files:
+        try:
+            with open(file, 'rb') as f:
+                res = s.post(endpoint, files={'file': f})
+                if res.status_code == 200:
+                    print(f'Uploaded "{file}, id = {res.text}"')
+                else:
+                    print(f'Error uploading "{file}": ${res.text}')
+        except Exception as e:
+            print(f'Error uploading "{file}": ${e}')
+
+
+def get_file(url: str, id: int, destination: str, scale=1.0):
+    endpoint = url + '/get'
+    try:
+        res = requests.get(endpoint, params={'id':id})
+        if res.status_code != 200:
+            print(f"Error downloading file: {res.text}")
+        data = res.content
+        with open(destination, 'wb') as f:
+            f.write(data)
+    except Exception as e:
+        print(f"Error downloading file: {e}")
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--host', type=str, help='host to work with', default='vezdekod.leadpogrommer.ru')
+    sub_parsers = parser.add_subparsers(dest='action')
+    parser_upload = sub_parsers.add_parser('upload', help='Upload images to service')
+    parser_upload.add_argument('items', nargs='+', type=str)
+
+    parser_get = sub_parsers.add_parser('get', help='Get image from service')
+    parser_get.add_argument('id', help='id of the image', type=int)
+    parser_get.add_argument('destination', help='Where to save file', type=str)
+
+    args = parser.parse_args()
+    # print(args)
+    url = f'http://{args.host}'
+    if args.action == 'get':
+        get_file(url, args.id, args.destination)
+    elif args.action == 'upload':
+        upload_file(url, args.items)
