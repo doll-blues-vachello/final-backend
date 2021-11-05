@@ -13,3 +13,6 @@ optional parameter `scale`
 
 ### Running
 `docker-compose up --build`
+
+### Images that aren't similar, but other db's might think that they ate the same
+Look in `test-images` directory
