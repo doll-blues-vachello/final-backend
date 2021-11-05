@@ -6,7 +6,7 @@ services:
       - 80:5000
     depends_on:
       - "db"
-    command: ["./wait-for-it.sh", "db:3306", "--", "python", "main.py"]
+    command: ["./wait-for-it.sh", "db:3306", "--timeout=60", "--", "python", "main.py"]
     environment:
       DB_HOST: "db"
     stop_signal: SIGINT

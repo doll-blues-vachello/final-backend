@@ -22,7 +22,7 @@ def upload_file(url: str, files: list[str]):
 def get_file(url: str, id: int, destination: str, scale=1.0):
     endpoint = url + '/get'
     try:
-        res = requests.get(endpoint, params={'id':id})
+        res = requests.get(endpoint, params={'id':id, 'scale': scale})
         if res.status_code != 200:
             print(f"Error downloading file: {res.text}")
         data = res.content
@@ -40,13 +40,13 @@ if __name__ == '__main__':
     parser_upload.add_argument('items', nargs='+', type=str)
 
     parser_get = sub_parsers.add_parser('get', help='Get image from service')
+    parser_get.add_argument('--scale', help='Image scale', type=float, default=1.0)
     parser_get.add_argument('id', help='id of the image', type=int)
     parser_get.add_argument('destination', help='Where to save file', type=str)
 
     args = parser.parse_args()
-    # print(args)
     url = f'http://{args.host}'
     if args.action == 'get':
-        get_file(url, args.id, args.destination)
+        get_file(url, args.id, args.destination, args.scale)
     elif args.action == 'upload':
         upload_file(url, args.items)
